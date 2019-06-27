@@ -1,41 +1,82 @@
 package com.rajbhar.rest.api.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.rajbhar.rest.api.dao.CustomerDao;
 import com.rajbhar.rest.api.entity.Customer;
 import com.rajbhar.rest.api.exception.CustomerNotFoundExcetion;
 
 @Service
 public class CustomerServiceImpl implements ICustomerService {
-	@Autowired
-	CustomerDao customerDao;
 
-	@Override
+	static Map<Integer, Customer> map = new HashMap<>();
+
+	static {
+		initCustomers();
+	}
+
+	private static void initCustomers() {
+		Customer customer = new Customer(100, "Raja", "Bangalore", 909090909, "Cashier");
+		Customer customer1 = new Customer(200, "Rani", "Mangalore", 989898989, "Manager");
+		Customer customer2 = new Customer(300, "Radhika", "Hyderbad", 979797979, "Clerk");
+
+		map.put(customer.getId(), customer);
+		map.put(customer1.getId(), customer1);
+		map.put(customer2.getId(), customer2);
+	}
+
+	// for adding customer
 	public List<Customer> addCustomer(Customer customer) {
-		// TODO Auto-generated method stub
-		return customerDao.addCustomer(customer);
+		map.put(customer.getId(), customer);
+       System.out.println("from add customer");
+		return getCustomers();
 	}
 
-	@Override
+	// for update customer details
 	public List<Customer> updateCustomer(Customer customer) throws CustomerNotFoundExcetion {
-		// TODO Auto-generated method stub
-		return customerDao.updateCustomer(customer);
+		if (map.containsKey(customer.getId())) {
+			map.put(customer.getId(), customer);
+		} else {
+			throw new CustomerNotFoundExcetion("Customer does not exits with id " + customer.getId());
+		}
+
+		return getCustomers();
 	}
 
-	@Override
+	// for search customer
 	public Customer searchCustomer(int id) throws CustomerNotFoundExcetion {
-		// TODO Auto-generated method stub
-		return customerDao.searchCustomer(id);
+		Customer tempCustomer;
+		if (map.containsKey(id)) {
+			tempCustomer = map.get(id);
+		} else {
+			throw new CustomerNotFoundExcetion("Customer does not exits with id " + id);
+		}
+
+		return tempCustomer;
 	}
 
-	@Override
+	// for delete customer
 	public List<Customer> deleteCustomer(int id) throws CustomerNotFoundExcetion {
-		// TODO Auto-generated method stub
-		return customerDao.deleteCustomer(id);
+		if (map.containsKey(id)) {
+			map.remove(id);
+		} else {
+			throw new CustomerNotFoundExcetion("Customer does not exits with id " + id);
+		}
+
+		return getCustomers();
+	}
+
+	// get List of customer
+	private List<Customer> getCustomers() {
+		List<Customer> list = new ArrayList<>();
+		Collection<Customer> cust = map.values();
+		list.addAll(cust);
+		return list;
 	}
 
 }
